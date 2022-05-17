@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load rounding %}
+
+
+{% block title %}Мои оценки{% endblock %}
+
+{% block profile_button %}
+    <a href="{% url 'main:profile' %}" id="login" title="Профиль"
+       class="button button_blue button_padding-20    " onclick="" data-category="" data-action=""
+       data-target="">
+        Профиль
+    </a>
+{% endblock %}
+
+{% block style %}
+<style>
+    .student-marks {
+        margin: 0;
+        position: absolute;
+        top: 32%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%)
+    }
+    .student {
+        padding-bottom: 20px;
+        font-size: 19px;
+    }
+    #period-{{ period }} {
+        color: white;
+        background: #25aac7;
+        padding: 3px 6px;
+    }
+    .marks-table {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 10px 5px;
+        font-size: 17px;
+    }
+    td {
+        padding: 6px 25px;
+        border: 1px solid black;
+    }
+    #mark-list {
+        {#display: flex;#}
+        width: 400px;
+        padding: 10px;
+        {#letter-spacing: 10px;#}
+    }
+    .mark {
+        margin: 0 3px;
+        font-size: 20px;
+        color: white;
+        width: 30px;
+        padding: 3px 6px 3px 6px;
+    }
+    #mark-2 {
+        background: crimson;
+    }
+    #mark-3 {
+        background: coral;
+    }
+    #mark-4 {
+        background: orange;
+    }
+    #mark-5 {
+        background: #18a230;
+    }
+    #mark-П {
+        background: crimson;
+    }
+    #mark-Б {
+        background: crimson;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="student-marks" style="text-align: center;">
+        <h1>Мои оценки</h1>
+        <div class="student">
+            <span id="fio">{{ student.name }} {{ student.surname }}</span>
+            <span id="class">{{ student.edu_class }} класс</span><br>
+        </div>
+        <a href="{% url 'main:my_marks' '1' %} " id="period-1">1 четверть</a>
+        <a href="{% url 'main:my_marks' '2' %} " id="period-2">2 четверть</a>
+        <a href="{% url 'main:my_marks' '3' %} " id="period-3">3 четверть</a>
+        <a href="{% url 'main:my_marks' '4' %} " id="period-4">4 четверть</a>
+        <a href="{% url 'main:my_marks' '0' %} " id="period-0">Итоговые</a>
+        <table class="marks-table" style="margin-top: 20px;">
+            <tr>
+                <td>№</td>
+                <td>Предмет</td>
+                <td>Оценки</td>
+                <td>Пропуски</td> {# добавить всего/по болезни #}
+                <td>Средний балл</td>
+                <td>{{ period }} четверть<br>Итог</td>
+            </tr>
+            {% for subject, marks, avg_mark in marks_info %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ subject }}</td>
+                    <td id="mark-list">
+                        {% for mark in marks %}
+                            <span class="mark" id="mark-{{ mark.mark }}">{{ mark.mark }}</span>
+                        {% endfor %}
+                    </td>
+                    <td></td> {# пропуски #}
+                    <td><span class="mark" id="mark-{{ avg_mark|round_num }}">{{ avg_mark }}</span></td>
+                    <td></td> {# итог/четв #}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+

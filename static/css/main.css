@@ -1,0 +1,257 @@
+body {
+    min-width: 990px;
+    width: 100%;
+    height: 100%;
+    font-family: "Open Sans", Arial;
+    font-size: 15px;
+}
+
+.header-anon__content {
+    width: 960px;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 102px;
+}
+
+.header-anon__logotype {
+    position: relative;
+    bottom: 4px;
+    z-index: 1;
+}
+
+div {
+    display: block;
+}
+
+a {
+    color: #428bca;
+    text-decoration: none;
+    background: 0 0;
+}
+
+.header-anon__menu-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+}
+
+.header-anon__menu {
+    height: 104px;
+    z-index: 1;
+}
+
+.menu {
+    font-size: 14px;
+    font-family: "Open Sans Semibold",Arial;
+    height: 100%;
+}
+
+.menu__layout {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.menu__layout_unit {
+    display: block;
+    float: left;
+}
+
+.menu__item_no-left-padding {
+    padding-left: 0;
+}
+
+.menu__item_border {
+    border-right: 1px solid #d3d3d3;
+}
+
+.menu__item {
+    text-decoration: none;
+    color: #808285;
+    padding-right: 17px;
+    padding-left: 17px;
+}
+
+.header-anon__buttons {
+    height: 102px;
+    padding-left: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+}
+
+.header-anon__button a.button_blue {
+    color: #00bae5;
+    border-color: #00bae5;
+}
+
+.header-anon__button a.button_green {
+    color: #19b47b;
+    border-color: #19b47b;
+    margin-left: 10px;
+}
+
+.header-anon__button a.button {
+    font-size: 15px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 6px 15px;
+    text-decoration: none;
+    text-align: center;
+    font-family: "Open Sans Semibold";
+    box-sizing: border-box;
+    background: 0 0;
+}
+
+.header-anon:after {
+    position: absolute;
+    content: ' ';
+    height: 100%;
+    width: 100%;
+    left: 0;
+    bottom: 2px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 30%);
+}
+
+.main_no-padding {
+    padding-bottom: 10px;
+}
+
+.main {
+    background-color: #f4f4f4;
+}
+
+.header-text {
+    font-size: 16px;
+    line-height: 24px;
+    color: #000;
+    font-weight: 400;
+    text-align: center;
+    padding: 20px 0;
+    background-color: #fff;
+    margin: 0;
+}
+
+.header-text_gray {
+    color: #808285;
+}
+
+.slider {
+    height: 484px;
+}
+
+.slider__layout {
+    width: 100%;
+    height: 434px;
+    display: block;
+    overflow: hidden;
+}
+
+.slider__line {
+    width: 400%;
+    height: 434px;
+}
+
+.slider__item_hidden {
+    display: none;
+}
+
+.slider__item_teachers {
+    background-image: url(../../../img/slider/teacher-background.jpg);
+    background-size: cover;
+}
+
+.slider__item {
+    width: 25%;
+    height: 100%;
+    float: left;
+}
+
+.container {
+    width: 960px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.slider__item__content {
+    text-shadow: 0 1px 1px rgb(0 0 0 / 60%);
+    color: #fff;
+    height: 434px;
+}
+
+.slider__item__content__image_teacher {
+    margin-top: 17px;
+}
+
+img {
+    vertical-align: middle;
+    border: 0;
+}
+
+.slider__item__content__text {
+    float: left;
+    width: calc(100% - 400px);
+    height: 280px;
+}
+
+.slider__item__content__text_title {
+    margin-top: 45px;
+    font-family: Museo Cyrl;
+    font-size: 50px;
+}
+
+.slider__item__content__text_title-name {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 40px;
+}
+
+.slider__item__content__text_description {
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.slider__item__content__button {
+    float: left;
+    width: 170px;
+    height: 45px;
+}
+
+.button_grey-rounded {
+    color: #231f20;
+    padding: 12px 0;
+    border-radius: 24px;
+    font-family: "Open Sans Semibold";
+    font-size: 16px;
+    text-shadow: 0 1px 0 rgb(255 255 255 / 40%);
+    background-color: #cbcbcb;
+    border: 0;
+    background-image: linear-gradient(to bottom,#dadada 0,#a8a8a2 100%);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 60%), inset 0 0 1px 0 rgb(0 0 0 / 50%);
+    opacity: .9;
+}
+
+.button {
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    outline: 0;
+}
+
+.slider__item__content__image {
+    text-align: right;
+}

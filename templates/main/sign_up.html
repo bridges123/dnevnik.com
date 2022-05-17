@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}Регистрация{% endblock %}
+
+{% block profile_button %}
+    <a href="{% url 'main:profile' %}" id="login" title="Профиль"
+       class="button button_blue button_padding-20    " onclick="" data-category="" data-action=""
+       data-target="">
+        Профиль
+    </a>
+{% endblock %}
+
+{% block style %}
+    <style>
+        #reg {
+            text-align: center;
+        }
+        .sign-up {
+            margin: 0;
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%)
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="sign-up">
+        <h1 id="reg">Регистрация</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Регистрация</button>
+        </form>
+    </div>
+{% endblock %}
+

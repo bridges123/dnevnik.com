@@ -1,0 +1,643 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load rounding %}
+
+
+{% block title %}Оценки {{ edu_class }}{% endblock %}
+
+{% block profile_button %}
+    <a href="{% url 'main:profile' %}" id="login" title="Профиль"
+       class="button button_blue button_padding-20" onclick="" data-category="" data-action=""
+       data-target="">
+        Профиль
+    </a>
+{% endblock %}
+
+{% block style %}
+    <style>
+        .change-marks {
+            margin: 0;
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%)
+        }
+
+        #period-{{ period }} {
+            color: white;
+            background: #25aac7;
+            padding: 3px 6px;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        .dv-table {
+            border: 2px solid #525252;
+            overflow-x: scroll;
+            width: 1300px;
+        }
+
+        .stick {
+            position: -webkit-sticky; /* Required for Safari */
+            position: sticky;
+            left: -2px;
+            background: white;
+            z-index: 1;
+        }
+
+        .marks-table {
+            padding: 10px 5px;
+            font-size: 17px;
+        }
+
+        td {
+            padding: 6px 15px;
+            border: 1px solid #525252;
+            text-align: center;
+        }
+
+        .spec-cell {
+            background-color: rgba(29, 131, 161, 0.17);
+        }
+
+        .wt {
+            cursor: pointer;
+        }
+
+        .date {
+            color: rgb(7, 99, 204);
+        }
+
+        .mark {
+            margin: 0 2px;
+            font-size: 20px;
+            color: white;
+            width: 30px;
+            padding: 3px 6px 3px 6px;
+            cursor: pointer;
+        }
+
+        .selected-mark {
+            border: 2px solid #525252;
+        }
+
+        .not-added span {
+            display: none;
+            padding: 0;
+            background-color: green;
+            border: 1px solid green;
+            border-radius: 50%;
+        }
+
+        #mark-2 {
+            background: crimson;
+        }
+
+        #mark-3 {
+            background: coral;
+        }
+
+        #mark-4 {
+            background: orange;
+        }
+
+        #mark-5 {
+            background: #18a230;
+        }
+
+        #mark-П {
+            background: crimson;
+        }
+
+        #mark-Б {
+            background: crimson;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="change-marks">
+        <h1>Управление оценками</h1>
+        <div style="display: flex; margin-top: 20px;">
+            <h3 style="margin-right: 30px;">Учитель: {{ teacher }}</h3>
+            <h3>Класс: {{ edu_class }}</h3>
+        </div>
+        <a href="{% url 'main:change-marks' edu_class '1' %} " id="period-1">1 четверть</a>
+        <a href="{% url 'main:change-marks' edu_class '2' %} " id="period-2">2 четверть</a>
+        <a href="{% url 'main:change-marks' edu_class '3' %} " id="period-3">3 четверть</a>
+        <a href="{% url 'main:change-marks' edu_class '4' %} " id="period-4">4 четверть</a>
+        <a href="{% url 'main:change-marks' edu_class '0' %} " id="period-0">Итоговые</a>
+        {% if subject %}
+            <form method="post" style="margin: 20px 0;">
+                {% csrf_token %}
+                <select name="select-subject" id="select-subject" style="height:25px; font-size: 17px;">
+                    {% for subj in subjects %}
+                        {% if subj == subject %}
+                            <option selected disabled value="{{ subject }}">{{ subject }}</option>
+                        {% else %}
+                            <option value="{{ subj.name }}">{{ subj.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <button type="submit" class="next" style="height: 25px; font-size: 17px;">Далее</button>
+            </form>
+            <div class="dv-table">
+                <table class="marks-table">
+                    <tr>
+                        <td class="stick" rowspan="4" colspan="1"></td>
+                        <td class="spec-cell" colspan="999">{{ period }} четверть</td>
+                    </tr>
+                    <tr>
+                        {% for month_num, month, days, count in months %}
+                            <td class="spec-cell" colspan="{{ count }}">{{ month }}</td>
+                        {% endfor %}
+                        <td class="spec-cell" rowspan="3">Ср. балл</td>
+                    </tr>
+                    <tr>
+                        {% for month_num, month, days, count in months %}
+                            {% for day in days %}
+                                <td class="spec-cell date" colspan="{{ day.1|length}}" month="{{ month_num }}">{{ day.0 }}</td>
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for month_num, month, days, count in months %}
+                            {% for day in days %}
+                                {% if day.1 %}
+                                    {% for plan in day.1 %}
+                                        <td class="spec-cell wt" plan-id="{{ plan.id }}" date="{{ day.0 }}-{{ month_num }}-{{ now_year }}">{{ plan.work_type }}</td>
+                                    {% endfor %}
+                                {% else %}
+                                    <td class="spec-cell" date="{{ day.0 }}/{{ month }}/{{ now_year }}"></td>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                    {% for student, marks in students %}
+                        <tr class="counter" counter="{{ forloop.counter }}">
+                            <td class="stick" style="padding: 0; border: 0">
+                                <table style="">
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ student.surname }} {{ student.name.0.upper }}.{{ student.patronymic.0.upper }}.</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            {% for month_marks in marks %}
+                                {% for day_info, date in month_marks %} {# ???????????? #}
+                                    {% if day_info %}
+                                        {% for mark, work_type in day_info %}
+                                            {% if mark.mark %}
+                                                <td><span class="mark main-mark" id="mark-{{ mark.mark }}" mark-date="{{ date }}" work-type="{{ work_type }}" mark-id="{{ mark.id }}">{{ mark.mark }}</span></td>
+                                            {% else %}
+                                                <td class="not-added"><span class="mark na-mark" mark-date="{{ date }}" work-type="{{ work_type }}" student-id="{{ student.id }}">+</span></td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td class="not-added"><span class="mark na-mark" mark-date="{{ date }}" student-id="{{ student.id }}">+</span></td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            <td class="avg-mark"></td> {# ср балл #}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    <div id="na-wt-modal" style="display: none; position: absolute; width: 300px; height: 133px; background: white; padding: 5px; border: 2px solid #525252;">
+        <div class="close"
+             style="cursor: pointer; position: relative; left: 95%; width: 1em; height: 1em; background-color: red; clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);"></div>
+        <div style="text-align: right; padding-right: 23px; padding-top: 5px;">
+            Описание: <input class="new-wt-plan-text" style='width: 177px; text-align: center;' value="">
+        </div>
+        <div style='margin-top: 15px; text-align: right; padding-right: 23px'>
+            Тип работы:
+            <select name="select-na-wt" id="select-na-wt" style="width: 185px; height:25px; font-size: 15px;">
+                {% for wt in work_types %}
+                    <option value="{{ wt.0 }}">{{ wt.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style='text-align: center; margin-top: 20px'>
+            <button class="new-wt-button" style='height: 25px; width:120px; align-items: center; font-size: 15px;'>Добавить</button>
+        </div>
+    </div>
+
+    <div id="wt-modal" style="display: none; position: absolute; width: 300px; height: 133px; background: white; padding: 5px; border: 2px solid #525252;">
+        <div class="close"
+             style="cursor: pointer; position: relative; left: 95%; width: 1em; height: 1em; background-color: red; clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);"></div>
+        <div style="text-align: right; padding-right: 23px; padding-top: 5px;">
+            Описание: <input class="plan-text" style='width: 177px; text-align: center;' value="">
+        </div>
+        <div style='margin-top: 15px; text-align: right; padding-right: 23px'>
+            Тип работы:
+            <select name="select-wt" id="select-wt" style="width: 185px; height:25px; font-size: 15px;">
+                {% for wt in work_types %}
+                    <option value="{{ wt.0 }}">{{ wt.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style='text-align: center; margin-top: 20px'>
+            <button class="change-wt-button" style='height: 25px; width:120px; align-items: center; font-size: 15px;'>Изменить</button>
+        </div>
+    </div>
+
+    <div id="na-modal" style="display: none; position: absolute; width: 300px; height: 133px; background: white; padding: 5px; border: 2px solid #525252;">
+        <div class="close"
+             style="cursor: pointer; position: relative; left: 95%; width: 1em; height: 1em; background-color: red; clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);"></div>
+        <div style='text-align: right; padding-right: 23px; padding-top: 5px;'>
+            Описание: <input class="na-comment" style='width: 185px; text-align: center;' value="">
+        </div>
+        <div style='margin-top: 15px; text-align: right; padding-right: 23px'>
+            <div class="na-edition-marks">
+                <span>Изменить: </span>
+                {% for m in mark_types %}
+                    <span class='mark edit-mark' id='mark-{{ m }}'>{{ m }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div style='text-align: center; margin-top: 20px'>
+            <button class="new-mark-button" style='height: 25px; width:120px; align-items: center; font-size: 15px;'>Добавить</button>
+        </div>
+    </div>
+
+    <div id="modal" style="display: none; position: absolute; width: 300px; height: 133px; background: white; padding: 5px; border: 2px solid #525252;">
+        <div class="close"
+             style="cursor: pointer; position: relative; left: 95%; width: 1em; height: 1em; background-color: red; clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);"></div>
+        <div style="text-align: right; padding-right: 23px; padding-top: 5px;">
+            Описание: <input class="comment" style="width: 185px; text-align: center;" value="">
+        </div>
+        <div style="margin-top: 15px; text-align: right; padding-right: 23px">
+            <div class="edition-marks">
+                <span>Изменить: </span>
+                {% for m in mark_types %}
+                    <span class='mark edit-mark' id="mark-{{ m }}">{{ m }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div style='text-align: center; margin-top: 20px'>
+            <button class="change-button" style="height: 25px; margin-right: 30px;">Изменить</button>
+            <button class="delete-button" style="height: 25px;">Удалить</button>
+        </div>
+    </div>
+
+    <script>
+        let lastMark = -1;
+        let lastDate = "";
+        let lastPlanId = "";
+
+        let modalMarkId = "";
+
+        let naWorkType = "";
+        let naMarkDate = "";
+        let naStudentId = "";
+
+        let wtDate;
+        let wtPlanId;
+
+
+        function createModal(that) {
+            let top = $(that).offset().top + $(that).height() + 4;
+            let left = $(that).offset().left + $(that).width() * 2;
+            let markValue = that.textContent.trim();
+            if (modalMarkId !== lastMark) {
+                lastMark = modalMarkId;
+                $('.comment').val('');
+                {% for mm in marks %}
+                    if ("{{ mm.mark }}" === markValue) {
+                        $('.comment').val('{{ mm.comment }}');
+                    }
+                {% endfor %}
+                let editMarks = document.getElementsByClassName('edition-marks')[0].getElementsByClassName('edit-mark');
+                for (let editMark of editMarks) {
+                    if ($(editMark).hasClass('selected-mark')) {
+                        $(editMark).removeClass('selected-mark');
+                    }
+                }
+                for (let editMark of editMarks) {
+                    if (editMark.textContent === markValue) {
+                        $(editMark).addClass('selected-mark');
+                        break;
+                    }
+                }
+            }
+            let div = $('#modal')
+            div.css('top', top);
+            div.css('left', left);
+            div.show();
+        }
+
+        function createNaModal(that) {
+            let top = $(that).offset().top + $(that).height() + 4;
+            let left = $(that).offset().left + $(that).width() * 2;
+            let markValue = '2';
+            let markDate = $(that).attr('mark-date');
+            if (lastDate !== markDate) {
+                lastDate = markDate;
+                $('.na-comment').val('');
+                let editMarks = document.getElementsByClassName('na-edition-marks')[0].getElementsByClassName('edit-mark');
+                for (let editMark of editMarks) {
+                    if ($(editMark).hasClass('selected-mark')) {
+                        $(editMark).removeClass('selected-mark');
+                    }
+                }
+                $(editMarks[0]).addClass('selected-mark');
+            }
+            let div = $('#na-modal')
+            div.css('top', top);
+            div.css('left', left);
+            div.show();
+        }
+
+        function createWtModal(that) {
+            let top = $(that).offset().top + $(that).height() + 4;
+            let left = $(that).offset().left + $(that).width() * 2;
+            let dateList = $(that).attr('date').split('-');
+            wtDate = new Date(Number(dateList[2]), Number(dateList[1])-1, Number(dateList[0]));
+            if (lastPlanId !== wtPlanId) {
+                lastPlanId = wtPlanId;
+                $('.plan-text').val('');
+                {% for wp in work_plans %}
+                    if ("{{ wp.id }}" === wtPlanId) {
+                        $('.plan-text').val('{{ wp.plan_text }}');
+                        $('#select-wt').val('{{ wp.work_type }}');
+                    }
+                {% endfor %}
+            }
+            let div = $('#wt-modal')
+            div.css('top', top);
+            div.css('left', left);
+            div.show();
+        }
+
+        function newMarkBack() {
+            let new_value = document.getElementsByClassName('selected-mark')[0].textContent;
+            let new_comment = $('.na-comment').val();
+            let work_type = naWorkType;
+            let mark_date = naMarkDate;
+            let subject = "{{ subject }}";
+            let date = "{{ subject }}";
+            let student_id = naStudentId;
+            if (new_comment === '') new_comment = 'Отсутствует';
+            $.ajax({
+                type: "POST",
+                data: {
+                    action: "add",
+                    student_id: student_id,
+                    subject: subject,
+                    edu_class: "{{ edu_class }}",
+                    new_value: new_value,
+                    new_comment: new_comment,
+                    work_type: work_type,
+                    mark_date: mark_date,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                url: "{% url 'main:mark-back' %}"
+            });
+            setTimeout(function () {
+                location.reload();
+            }, 50);
+        }
+
+        function editMarkBack() {
+            let markId = modalMarkId;
+            let new_value = document.getElementsByClassName('selected-mark')[0].textContent;
+            let new_comment = $('.comment').val();
+            if (new_comment === '') new_comment = 'Отсутствует';
+            $.ajax({
+                type: "POST",
+                data: {
+                    action: "change",
+                    mark_id: markId,
+                    new_value: new_value,
+                    new_comment: new_comment,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                url: "{% url 'main:mark-back' %}",
+                success: function (data) {
+                    if (data.success)
+                        setTimeout(function () {
+                            location.reload();
+                        }, 50);
+                    else
+                        alert(data.msg);
+                }
+            });
+        }
+
+        function editWtBack() {
+            let new_wt = $('#select-wt').val();
+            let new_plan_text = $('.plan-text').val();
+            if (new_plan_text === '') new_plan_text = 'Отсутствует';
+            $.ajax({
+                type: "POST",
+                data: {
+                    action: "change",
+                    plan_id: Number(wtPlanId),
+                    new_wt: new_wt,
+                    new_plan_text: new_plan_text,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                url: "{% url 'main:wt-back' %}",
+                success: function (data) {
+                    if (data.success)
+                        setTimeout(function () {
+                            location.reload();
+                        }, 50);
+                    else
+                        alert(data.msg);
+                }
+            });
+        }
+
+        {# подсчёт среднего балла #}
+        let mark_types = ['2', '3', '4', '5'];
+        let avg_cells = document.getElementsByClassName('avg-mark');
+        let mark_rows = document.getElementsByClassName('counter');
+        for (let i = 0;i < mark_rows.length;i++) {
+            let sm_sum = 0;
+            let counter = 0;
+            let student_marks = mark_rows[i].getElementsByClassName('main-mark');
+            for (let j = 0;j < student_marks.length;j++) {
+                if (mark_types.includes(student_marks[j].textContent)) {
+                    sm_sum += Number(student_marks[j].textContent);
+                    counter += 1;
+                }
+            }
+            avg_cells[i].textContent = String(Math.round(sm_sum / counter * 100) / 100);
+        }
+
+        $(".comment").keyup(function(event){
+            if(event.keyCode === 13){
+                editMarkBack();
+            }
+        });
+
+        $(".na-comment").keyup(function(event){
+            if(event.keyCode === 13){
+                newMarkBack();
+            }
+        });
+
+        $(".plan-text").keyup(function(event){
+            if(event.keyCode === 13){
+                editWtBack();
+            }
+        });
+
+        $(".new-wt-plan-text").keyup(function(event){
+            if(event.keyCode === 13){
+                newWtBack();
+            }
+        });
+
+        $('.not-added').hover(function () {
+            if ($('#modal').css('display') === 'none' && $('#na-modal').css('display') === 'none' && $('#wt-modal').css('display') === 'none') {
+                $(this).children()[0].style.display = "block";
+            }
+        }, function () {
+            if ($('#modal').css('display') === 'none' && $('#na-modal').css('display') === 'none' && $('#wt-modal').css('display') === 'none') {
+                $(this).children()[0].style.display = "none";
+            }
+        });
+
+        $('.wt').click(function () {
+            wtPlanId = $(this).attr('plan-id');
+            if ($('#modal').css('display') !== 'none' || $('#na-modal').css('display') !== 'none' || $('#wt-modal').css('display') !== 'none') {
+                $('#modal').hide();
+                $('#na-modal').hide();
+                $('#wt-modal').hide();
+                let nai = document.getElementsByClassName('not-added');
+                for (let i = 0;i < nai.length;i++) {
+                    nai[i].children[0].style.display = "none";
+                }
+            }
+            createWtModal(this);
+        });
+
+        $('.na-mark').click(function () {
+            let workType = $(this).attr('work-type');
+            let markDate = $(this).attr('mark-date');
+            let studentId = $(this).attr('student-id');
+            if ($('#modal').css('display') !== 'none' || $('#na-modal').css('display') !== 'none') {
+                $('#na-modal').hide();
+                $('#modal').hide();
+                let nai = document.getElementsByClassName('not-added');
+                for (let i = 0;i < nai.length;i++) {
+                    nai[i].children[0].style.display = "none";
+                }
+            }
+            createNaModal(this);
+            naWorkType = workType;
+            naMarkDate = markDate;
+            naStudentId = studentId;
+        });
+
+        $('.main-mark').click(function () {
+            modalMarkId = Number($(this).attr('mark-id'));
+            if ($('#modal').css('display') === 'none' && $('#na-modal').css('display') === 'none' && $('#wt-modal').css('display') === 'none') {
+                createModal(this);
+            } else {
+                $('#modal').hide()
+                $('#na-modal').hide()
+                $('#wt-modal').hide()
+                let nai = document.getElementsByClassName('not-added');
+                for (let i = 0;i < nai.length;i++) {
+                    nai[i].children[0].style.display = "none";
+                }
+                if ($('#modal').attr('mark-id') !== modalMarkId) {
+                    createModal(this);
+                }
+            }
+        });
+
+        $('.edit-mark').click(function () {
+            let editMarks = document.getElementsByClassName('edit-mark');
+            for (let editMark of editMarks) {
+                if ($(editMark).hasClass('selected-mark')) {
+                    $(editMark).removeClass('selected-mark');
+                    break;
+                }
+            }
+            $(this).addClass('selected-mark');
+        });
+
+        $('.close').click(function () {
+            $('#modal').hide()
+            $('#na-modal').hide()
+            $('#wt-modal').hide()
+            let nai = document.getElementsByClassName('not-added');
+            for (let i = 0;i < nai.length;i++) {
+                nai[i].children[0].style.display = "none";
+            }
+        });
+
+        $('.new-mark-button').click(function () {
+            newMarkBack();
+        });
+
+        $('.change-button').click(function () {
+            editMarkBack();
+
+            {# динамичный вариант, под который надо переделывать систему avg_mark #}
+            {# ------------------------------------------------------------------------------------------------------ #}
+            {#let changing_mark = document.querySelector("span[mark-id='" + markId + "']");#}
+            {#changing_mark.textContent = new_value;#}
+            {#changing_mark.id = `mark-${new_value}`;#}
+        });
+
+        $('.change-wt-button').click(function () {
+            editWtBack();
+        });
+
+        $('.new-wt-button').click(function () {
+            newWtBack();
+        });
+
+        $('.delete-button').click(function () {
+            let markId = modalMarkId;
+            let new_value = document.getElementsByClassName('selected-mark')[0].textContent;
+            $.ajax({
+                type: "POST",
+                data: {
+                    action: "delete",
+                    mark_id: markId,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                url: "{% url 'main:mark-back' %}",
+                success: function (data) {
+                    if (data.success)
+                        setTimeout(function () {
+                            location.reload();
+                        }, 50);
+                    else
+                        alert(data.msg);
+                }
+            });
+        });
+
+        document.addEventListener('keyup', function (event) {
+            if (event.code === 'Escape') {
+                if ($('#modal').css('display') !== 'none') {
+                    $('#modal').hide();
+                }
+                if ($('#na-modal').css('display') !== 'none') {
+                    $('#na-modal').hide();
+                }
+                if ($('#wt-modal').css('display') !== 'none') {
+                    $('#wt-modal').hide();
+                }
+                let nai = document.getElementsByClassName('not-added');
+                for (let i = 0;i < nai.length;i++) {
+                    nai[i].children[0].style.display = "none";
+                }
+            }
+        });
+    </script>
+{% endblock %}
+

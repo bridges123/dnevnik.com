@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="colored-line" style="width: 100%; height: 5px;">
+        <div class="colored-line__item colored-line__item_blue" style="background-color: #4cc0e2; height: 100%;
+        width: 20%; float: left;"></div>
+        <div class="colored-line__item colored-line__item_green" style="background-color: #bbd036; height: 100%;
+        width: 20%; float: left;"></div>
+        <div class="colored-line__item colored-line__item_yellow" style="background-color: #fed939; height: 100%;
+        width: 20%; float: left;"></div>
+        <div class="colored-line__item colored-line__item_orange" style="background-color: #f4931c; height: 100%;
+        width: 20%; float: left;"></div>
+        <div class="colored-line__item colored-line__item_violet" style="background-color: #b976af; height: 100%;
+        width: 20%; float: left;"></div>
+    </div>
+    <div class="header-anon__content">
+        <div class="header-anon__logotype">
+            <a href="{% url 'main:main' %}">
+                <img src="{% static 'logo.png' %}" alt="Дневник.ру">
+            </a>
+        </div>
+        <div class="header-anon__menu-wrapper">
+            <div class="header-anon__menu">
+                <nav class="menu">
+                    <ul class="menu__layout">
+                        <li class="menu__layout_unit">
+                            <a class="menu__item menu__item_border
+
+                   menu__item_no-left-padding
+                   " href="{% url 'main:about' %}" id="about">О сервисе</a>
+                        </li>
+                        <li class="menu__layout_unit">
+                            <a class="menu__item menu__item_border
+
+                   " href="{% url 'main:for_partners' %}" id="for-partners">Партнёрам</a>
+                        </li>
+                        <li class="menu__layout_unit">
+                            <a class="menu__item menu__item_border
+
+
+                   menu__item_noborder menu__item_no-right-padding" href="{% url 'main:support' %}" id="help">Поддержка</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="header-anon__buttons">
+                <div class="header-anon__button">
+                    {% if request.user.is_authenticated %}
+                        {% block profile_button %}
+
+                        {% endblock %}
+                    {% else %}
+                        <a href="{% url 'main:login' %}" id="login" title="Войти"
+                           class="button button_blue button_padding-20    " onclick="" data-category="" data-action=""
+                           data-target="">
+                            Войти
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="header-anon__button">
+                    <a href="{% url 'main:join_oo' %}" id="join-oo" title="Подключить ОО"
+                       class="button button_green button_padding-20 button_margin-left-20    " onclick=""
+                       data-category="" data-action="" data-target="">
+                        Подключить ОО
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block style %}{% endblock %}
+</header>
+{% block content %}{% endblock %}
+</body>
+</html>

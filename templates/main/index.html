@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Главная{% endblock %}
+
+{% block profile_button %}
+    <a href="{% url 'main:profile' %}" id="login" title="Профиль"
+       class="button button_blue button_padding-20    " onclick="" data-category="" data-action=""
+       data-target="">
+        Профиль
+    </a>
+{% endblock %}
+
+{% block style %}
+    <style>
+        h2 {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            margin: 0 -50% 0 0;
+            transform: translate(-50%, -50%)
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Прототип образовательного сервиса</h2>
+{% endblock %}
+

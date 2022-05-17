@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}Профиль{% endblock %}
+
+{% block profile_button %}
+    <a href="{% url 'main:logout' %}" id="logout" title="Выйти"
+       class="button button_blue button_padding-20    " onclick="" data-category="" data-action=""
+       data-target="">
+        Выйти
+    </a>
+{% endblock %}
+
+{% block style %}
+    <style>
+        .student-info, .teacher-info {
+            position: absolute;
+            top: 45%;
+            left: 30%;
+            margin: 0 -50% 0 0;
+            transform: translate(-50%, -50%)
+        }
+
+        img {
+            position: absolute;
+            top: 40%;
+            left: 45%;
+            margin: 0 -50% 0 0;
+            transform: translate(-50%, -50%)
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if student %}
+        <div class="student-info">
+            <h1>Ученик</h1>
+            <p>ФИО: {{ student }}</p>
+            <p>Школа: {{ student.school.school_type }} "{{ student.school.school_name }}"</p>
+            <p>Город: {{ student.school.city }}</p>
+            <p>Класс: {{ student.edu_class }}</p>
+            <p>Телефон: {{ student.phone }}</p>
+            <p>E-mail: {{ student.email }}</p>
+            <a href="{% url 'main:my_marks' 'period' %}" id="my-marks">
+                <button id="my-marks-button">Мои оценки</button>
+            </a>
+            <a href="{% url 'main:schedule' %}" id="schedule">
+                <button id="schedule-button">Расписание</button>
+            </a>
+        </div>
+        <img src="{{ student.photo.url }}" alt="Фото" style="height: 150px; width: 150px;">
+    {% elif teacher %}
+        <div class="teacher-info">
+            <h1>Преподаватель</h1>
+            <p>ФИО: {{ teacher }}</p>
+            <p>Школа: {{ teacher.school.school_type }} "{{ teacher.school.school_name }}"</p>
+            <p>Город: {{ teacher.school.city }}</p>
+            <p>Телефон: {{ teacher.phone }}</p>
+            <p>E-mail: {{ teacher.email }}</p>
+            <p>Мои классы:</p>
+            {% if classes %}
+                {% for class in classes %}
+                    <a href="{% url 'main:change-marks' class 'period' %}" id="my-marks">{{ class }}</a>
+                {% endfor %}
+            {% else %}
+                <p>Вы не управляете ни 1 классом.</p>
+            {% endif %}
+        </div>
+        <img src="{{ teacher.photo.url }}" alt="Фото" style="height: 150px; width: 150px;">
+    {% else %}
+        <h1>Ошибка поиска пользователя</h1>
+    {% endif %}
+{% endblock %}
+
