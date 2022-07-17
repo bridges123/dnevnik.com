@@ -94,7 +94,8 @@ class StudentProfile(models.Model):
         marks_info = []
 
         # пробегаемся про предметам Класса этого ученика
-        for subject in self.edu_class.subjects.all():
+        subjects = self.edu_class.subjects.all()
+        for subject in subjects:
             # берем сам предмет, оценки по этому предмету
             info = [subject, Mark.objects.filter(student=self, subject=subject, date__range=borders)]
             if info[1]:
@@ -108,6 +109,12 @@ class StudentProfile(models.Model):
                     info[2] = ''
             else:
                 info.append('')
+
+            try:
+                itog = FinalMark.objects.get(student=self, subject=subject, quarter=period)
+            except:
+                itog = ''
+            info.append(itog)
             marks_info.append(info)
         return marks_info
 
@@ -146,3 +153,13 @@ class Mark(models.Model):
         return quarter
 
     quarter = property(get_quarter)
+
+
+class FinalMark(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, verbose_name='Ученик')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
+    mark = models.CharField(max_length=1, verbose_name='Оценка', choices=(('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')))
+    quarter = models.CharField(max_length=1, verbose_name='Четверть', choices=utils.CHOICE_QUARTERS)
+
+    def __str__(self):
+        return f'Итоговая оценка {self.mark} | {self.subject} | {self.student}'

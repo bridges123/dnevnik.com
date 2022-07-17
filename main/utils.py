@@ -9,8 +9,17 @@ QUARTERS = {
     '1': (9, 10),
     '2': (11, 12),
     '3': (1, 2, 3),
-    '4': (4, 5)
+    '4': (4, 5),
+    '5': (6, 7, 8),
 }
+
+CHOICE_QUARTERS = (
+    ('1', '1 четверть'),
+    ('2', '2 четверть'),
+    ('3', '3 четверть'),
+    ('4', '4 четверть'),
+    ('5', 'Итоговая оценка'),
+)
 
 MONTHS = [
     'Январь',
@@ -65,7 +74,7 @@ def get_months_info(context, WorkingPlan):
     now = datetime.datetime.now()
     months_nums = QUARTERS[context['period']]
     for m in months_nums:
-        y = now.year if m >= now.month else now.year + 1
+        # y = now.year if m >= now.month else now.year + 1
         y = 2022
         days = []
         cells_count = 0
@@ -89,7 +98,7 @@ def get_students_info(context, Mark, StudentProfile):
         student_marks = []
         for month in context['months']:
             month_num = month[0]
-            y = now.year if month_num >= now.month else now.year + 1
+            # y = now.year if month_num >= now.month else now.year + 1
             y = 2022
             month_marks = []
             for day, plans in month[2]:

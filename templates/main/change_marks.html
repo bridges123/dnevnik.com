@@ -129,7 +129,7 @@
         <a href="{% url 'main:change-marks' edu_class '2' %} " id="period-2">2 четверть</a>
         <a href="{% url 'main:change-marks' edu_class '3' %} " id="period-3">3 четверть</a>
         <a href="{% url 'main:change-marks' edu_class '4' %} " id="period-4">4 четверть</a>
-        <a href="{% url 'main:change-marks' edu_class '0' %} " id="period-0">Итоговые</a>
+        <a href="{% url 'main:change-marks' edu_class '5' %} " id="period-5">Итоговые</a>
         {% if subject %}
             <form method="post" style="margin: 20px 0;">
                 {% csrf_token %}
@@ -469,7 +469,9 @@
                     counter += 1;
                 }
             }
-            avg_cells[i].textContent = String(Math.round(sm_sum / counter * 100) / 100);
+            let avg_mark = String(Math.round(sm_sum / counter * 100) / 100);
+            if (!isNaN(avg_mark))
+                avg_cells[i].textContent = avg_mark;
         }
 
         $(".comment").keyup(function(event){

@@ -1,6 +1,3 @@
-import datetime
-
-from django.db import models
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,7 +6,7 @@ from django.http.response import JsonResponse
 from .models import *
 from .forms import LoginForm, RegisterForm
 from . import utils
-from .models import Subject, School, Class, Mark, TeacherProfile, StudentProfile, WorkingPlan
+from .models import Subject, Class, Mark, TeacherProfile, StudentProfile, WorkingPlan
 
 
 def page_404(request):
@@ -119,27 +116,25 @@ def sign_up(request):
 
 
 @login_required(login_url='/login')
-def schedule(request):
-    context = {}
-    return render(request, 'main/schedule.html', context=context)
-
-
-@login_required(login_url='/login')
 def my_marks(request, period=''):
     try:
         user_profile = StudentProfile.objects.get(user=request.user)
     except:
         return redirect('/')
     if user_profile:
-        if period not in (f'{i}' for i in range(5)):
+        if period not in (f'{i}' for i in range(1, 5 + 1)):
             period = utils.get_quarter()
             return redirect(reverse('main:my_marks', args=(period,)))
         subjects = Subject.objects.all()
+        if period == '5':
+            marks_info = [(subject, [FinalMark.objects.filter(student=user_profile, subject=subject, quarter=str(i)) for i in range(1, 5 + 1)]) for subject in subjects]
+        else:
+            marks_info = user_profile.get_marks_info(period)
         context = {
             'period': period,
             'subjects': subjects,
             'student': user_profile,
-            'marks_info': user_profile.get_marks_info(period)
+            'marks_info': marks_info,
         }
         return render(request, 'main/my_marks.html', context=context)
 
@@ -154,7 +149,7 @@ def change_marks(request, edu_class='', period=''):
             if not edu_class:
                 return redirect(
                     reverse('main:change-marks', args=(teacher_profile.classes.all()[0].full_class, quarter)))
-            if period not in (f'{i}' for i in range(5)):
+            if period not in (f'{i}' for i in range(1, 5 + 1)):
                 period = quarter
                 return redirect(reverse('main:change-marks', args=(edu_class, period)))
         else:

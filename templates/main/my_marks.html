@@ -81,37 +81,62 @@
         <h1>Мои оценки</h1>
         <div class="student">
             <span id="fio">{{ student.name }} {{ student.surname }}</span>
-            <span id="class">{{ student.edu_class }} класс</span><br>
+            <span id="class">{{ student.edu_class }}</span><br>
         </div>
         <a href="{% url 'main:my_marks' '1' %} " id="period-1">1 четверть</a>
         <a href="{% url 'main:my_marks' '2' %} " id="period-2">2 четверть</a>
         <a href="{% url 'main:my_marks' '3' %} " id="period-3">3 четверть</a>
         <a href="{% url 'main:my_marks' '4' %} " id="period-4">4 четверть</a>
-        <a href="{% url 'main:my_marks' '0' %} " id="period-0">Итоговые</a>
-        <table class="marks-table" style="margin-top: 20px;">
-            <tr>
-                <td>№</td>
-                <td>Предмет</td>
-                <td>Оценки</td>
-                <td>Пропуски</td> {# добавить всего/по болезни #}
-                <td>Средний балл</td>
-                <td>{{ period }} четверть<br>Итог</td>
-            </tr>
-            {% for subject, marks, avg_mark in marks_info %}
+        <a href="{% url 'main:my_marks' '0' %} " id="period-5">Итоговые</a>
+        {% if period == '5' %}
+            <table class="marks-table" style="margin-top: 20px;">
                 <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ subject }}</td>
-                    <td id="mark-list">
-                        {% for mark in marks %}
-                            <span class="mark" id="mark-{{ mark.mark }}">{{ mark.mark }}</span>
-                        {% endfor %}
-                    </td>
-                    <td></td> {# пропуски #}
-                    <td><span class="mark" id="mark-{{ avg_mark|round_num }}">{{ avg_mark }}</span></td>
-                    <td></td> {# итог/четв #}
+                    <td>№</td>
+                    <td>Предмет</td>
+                    <td>1 чтв</td>
+                    <td>2 чтв</td>
+                    <td>3 чтв</td>
+                    <td>4 чтв</td>
+                    <td>Год</td>
                 </tr>
-            {% endfor %}
-        </table>
+                {% for subject, marks in marks_info %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ subject }}</td>
+                        {% for mark in marks %}
+                            <td>
+                                <span class="mark" id="mark-{{ mark.0.mark }}">{{ mark.0.mark }}</span>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <table class="marks-table" style="margin-top: 20px;">
+                <tr>
+                    <td>№</td>
+                    <td>Предмет</td>
+                    <td>Оценки</td>
+                    <td>Пропуски</td> {# добавить всего/по болезни #}
+                    <td>Средний балл</td>
+                    <td>{{ period }} четверть<br>Итог</td>
+                </tr>
+                {% for subject, marks, avg_mark, itog in marks_info %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ subject }}</td>
+                        <td id="mark-list">
+                            {% for mark in marks %}
+                                <span class="mark" id="mark-{{ mark.mark }}">{{ mark.mark }}</span>
+                            {% endfor %}
+                        </td>
+                        <td></td> {# пропуски #}
+                        <td><span style="font-size: 20px;">{{ avg_mark }}</span></td>
+                        <td><span style="font-size: 20px;">{{ itog.mark }}</span></td> {# итог/четв #}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
     </div>
 {% endblock %}
 
